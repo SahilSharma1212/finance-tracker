@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
+import { Notebook } from "lucide-react";
 
 export default function HomePage() {
   const router = useRouter();
@@ -71,6 +72,15 @@ export default function HomePage() {
         >
           Sign in
         </Button>
+      </motion.div>
+      <motion.div
+        initial={{ opacity: 0, scale: 0.8 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ delay: 0.8, duration: 0.5 }}
+        className="text-wrap mt-3 gap-2 flex flex-wrap"
+      >
+      <Notebook/>{" "}
+      <p>(Middleware is not implemented so you can navigate through pages , but signin signup is required)</p>
       </motion.div>
     </div>
   );

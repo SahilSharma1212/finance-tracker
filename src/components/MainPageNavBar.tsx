@@ -1,13 +1,12 @@
 // /app/main/layout.tsx
 "use client";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname} from "next/navigation";
 import { cn } from "@/lib/utils"; // If you have a 'cn' utility for classNames merging
-import { Toaster } from "react-hot-toast";
+
 
 export default function MainAppLayout() {
   const pathname = usePathname();
-
   return (
     <div className="bg-black text-white flex flex-col">
       {/* Navbar */}
@@ -30,11 +29,18 @@ export default function MainAppLayout() {
         >
           Dashboard
         </Link>
+        <Link
+          href="/budgeting"
+          className={cn(
+            "text-lg font-semibold transition hover:text-purple-400",
+            pathname === "/budgeting" ? "text-purple-500 bg-purple-300/15 p-2 rounded-md" : "text-white/80"
+          )}
+        >
+          Budgeting
+        </Link>
+        
       </nav>
 
-      {/* Content */}
-
-      <Toaster />
     </div>
   );
 }

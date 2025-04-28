@@ -1,12 +1,14 @@
 import mongoose, { Schema, Document, Types } from "mongoose";
 
+
 // 🔹 User Interface
 export interface User extends Document {
-  username: string;               // Username of the user
-  email: string;                  // Email of the user
-  password: string;               // Hashed password
-  transactions: Types.ObjectId[]; // Array of Transaction ObjectIds
-  createdAt: Date;                // User creation date
+  username: string;
+  email: string;
+  password: string;
+  transactions: Types.ObjectId[];
+  createdAt: Date;
+  budgets:  Types.ObjectId[]; // << Add this line
 }
 
 // 🔹 User Schema
@@ -28,13 +30,20 @@ const financialUserSchema = new Schema<User>({
   transactions: [
     {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Transaction", // Reference to Transaction model
+      ref: "Transaction",
     },
   ],
   createdAt: {
     type: Date,
     default: Date.now,
   },
+  budgets: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "BudgetModel", // New Budget model ka reference
+    }
+  ]
+  
 });
 
 // 🔹 User Model

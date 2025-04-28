@@ -16,3 +16,9 @@ export type TransactionType = {
   createdAt: Date; // Transaction creation date
   updatedAt: Date; // Transaction last update date
 };
+
+
+export type logoutResponse = {
+  success:boolean,
+  message:string
+}

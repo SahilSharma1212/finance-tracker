@@ -22,7 +22,7 @@ export default function DashboardPage() {
     async function fetchTransactions() {
       try {
         const res = await axios.get("/api/get-transactions");
-        setTransactions(res.data.transactions); // Assuming API returns { transactions: [...] }
+        setTransactions(res.data.transactions || []); // Ensure the transactions array is defined
       } catch (error) {
         console.error("Failed to fetch transactions", error);
       }
@@ -33,7 +33,7 @@ export default function DashboardPage() {
 
   useEffect(() => {
     // Whenever transactions or timeframe changes, update chart data
-    if (transactions.length === 0) return;
+    if (transactions.length === 0) return; // Guard against empty transactions
 
     const now = new Date();
     let filtered: Transaction[] = [];

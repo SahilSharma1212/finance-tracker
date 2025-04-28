@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import axios from "axios";
 import { Label } from "@/components/ui/label";
 import { toast, Toaster } from "react-hot-toast";
@@ -15,7 +15,7 @@ interface Category {
 interface Transaction {
   category: string;
   amount: number;
-  createdAt: string; // The date when the transaction was created
+  createdAt: string;
 }
 
 interface BudgetType {
@@ -25,28 +25,29 @@ interface BudgetType {
   categories: Category[];
 }
 
-export default function BudgetComparisonPage() {
+const BudgetComparisonPage = () => {
   const [budget, setBudget] = useState<BudgetType | null>(null);
   const [expenses, setExpenses] = useState<{ [key: string]: number }>({});
   const [loading, setLoading] = useState(true);
   const searchParams = useSearchParams();
 
-  const budgetId = searchParams.get('budgetId'); // Get budgetId from URL params
+  const budgetId = searchParams.get('budgetId');
 
   const fetchBudget = async () => {
-    try {
-      if (!budgetId) {
-        toast.error("Budget ID is missing.");
-        return;
-      }
+    if (!budgetId) {
+      toast.error("Budget ID is missing.");
+      setLoading(false);
+      return;
+    }
 
-      // Fetch all budgets
+    try {
       const res = await axios.get("/api/get-budgets");
-      
+
       if (res.data.success) {
-        // Find the budget that matches the budgetId from the URL
-        const matchedBudget = res.data.budgets.find((budget: BudgetType) => budget._id === budgetId);
-        
+        const matchedBudget = res.data.budgets.find(
+          (budget: BudgetType) => budget._id === budgetId
+        );
+
         if (matchedBudget) {
           setBudget(matchedBudget);
         } else {
@@ -69,31 +70,22 @@ export default function BudgetComparisonPage() {
 
       if (res.data.success) {
         const transactions: Transaction[] = res.data.transactions;
-        
-        // Filter transactions based on the budget timeframe and createdAt date
         const filteredTransactions = transactions.filter((transaction) => {
           const transactionDate = new Date(transaction.createdAt);
           const budgetStartDate = new Date(budget?.startDate || "");
-          const timeframe = budget?.timeframe === "month" ? 30 : 7; // Week or month
+          const timeframe = budget?.timeframe === "month" ? 30 : 7;
 
-          // Check if transaction is after budget start date and within the timeframe (week/month)
           return (
             transactionDate >= budgetStartDate &&
             transactionDate <= new Date(budgetStartDate.getTime() + timeframe * 24 * 60 * 60 * 1000)
           );
         });
 
-        // Sum expenses by category
         const categoryExpenses: { [key: string]: number } = {};
         filteredTransactions.forEach((transaction) => {
-          if (categoryExpenses[transaction.category]) {
-            categoryExpenses[transaction.category] += transaction.amount;
-          } else {
-            categoryExpenses[transaction.category] = transaction.amount;
-          }
+          categoryExpenses[transaction.category] = (categoryExpenses[transaction.category] || 0) + transaction.amount;
         });
 
-        // Set expenses in the state
         setExpenses(categoryExpenses);
       } else {
         toast.error("Failed to fetch transactions.");
@@ -103,8 +95,6 @@ export default function BudgetComparisonPage() {
       toast.error("Error fetching transactions.");
     }
   };
-
-
 
   useEffect(() => {
     if (budgetId) {
@@ -146,7 +136,7 @@ export default function BudgetComparisonPage() {
       </div>
 
       {/* Expense Input for Each Category */}
-      <div >
+      <div>
         {budget.categories.map((category) => (
           <div key={category.category} className="flex items-center gap-4 mb-4">
             <div className="flex-1">
@@ -158,8 +148,6 @@ export default function BudgetComparisonPage() {
             </div>
           </div>
         ))}
-
-
       </div>
 
       {/* Display Comparison Results */}
@@ -182,4 +170,13 @@ export default function BudgetComparisonPage() {
       <Toaster />
     </div>
   );
-}
+};
+
+// Wrap the page in Suspense for the client-side hooks
+const BudgetComparisonWithSuspense = () => (
+  <Suspense fallback={<div className="text-white">Loading...</div>}>
+    <BudgetComparisonPage />
+  </Suspense>
+);
+
+export default BudgetComparisonWithSuspense;

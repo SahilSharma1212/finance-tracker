@@ -9,7 +9,7 @@ type Transaction = {
   _id: string;
   amount: number;
   category: string;
-  createdAt: string; // assuming ISO date string
+  date: string; // Use `date` instead of `createdAt`
 };
 
 export default function DashboardPage() {
@@ -42,10 +42,10 @@ export default function DashboardPage() {
     if (timeframe === "week") {
       const sevenDaysAgo = new Date();
       sevenDaysAgo.setDate(now.getDate() - 7);
-      filtered = transactions.filter(txn => new Date(txn.createdAt) >= sevenDaysAgo);
+      filtered = transactions.filter(txn => new Date(txn.date) >= sevenDaysAgo); // Use `.date` here
     } else if (timeframe === "month") {
       const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-      filtered = transactions.filter(txn => new Date(txn.createdAt) >= firstDayOfMonth);
+      filtered = transactions.filter(txn => new Date(txn.date) >= firstDayOfMonth); // Use `.date` here
     }
 
     // Group by category and sum amounts
